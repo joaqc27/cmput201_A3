@@ -13,6 +13,11 @@
 
 int main(void){
 
+    //must call all 7 functions
+    //importDB(enter file name);
+    //int = countEntries();
+    //sortBy
+    //etc
 
     return 0;
 }

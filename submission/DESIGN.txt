@@ -1,6 +1,13 @@
+-----------------
 Authors: Joaquin Carbonell, Jigarjeet Mannan
 Class: CMPT201 Assignment 3
 Lab instructor: Dr. Philip Mees
 Lecture instructor: Dr. Philip Mees
 
 Purpose: Hold information regarding the design of the PicnicTable Database
+-----------------
+
+Design of PicnicTable Database:
+    -g
+    Designing the four database tables (array, struct or linked list)?
+        -
