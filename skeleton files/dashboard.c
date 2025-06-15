@@ -14,6 +14,11 @@
                      /* dashboard.c is not allowed access to the DB_impl.h private header */
 //You may include other system and custom headers as you see fit
 
+//call importDB() - takes a csv file, reads it, and creates the 5 tables simultaneously 
+
+//print all lookup tables and their values
+//print the main PicnicTable
+//print menu
 
 int main(int argc, char *argv[]){
 
