@@ -59,9 +59,7 @@ typedef struct {
     // table ID, site ID, table type ID, surface material ID,
     // structural material ID, street / avenue,  neighbourhood ID, ward,
     // latitude, longitude, see the assignment specs.
-    int capacity;
-    int size;
-
+   
     int tableID;        //unique ID; created by application
     int siteID;         //ID from csv
     int tableTypeID;    //Table Type Lookup
@@ -74,6 +72,9 @@ typedef struct {
     char latitude[50];  //Latitude from csv
     char longitude[50]; //Longitude from csv
 
+    //additional members added for implementation
+    int capacity;
+    int size;
     void *next;         //points to the next node
 
 } PicnicTable; // used in DataBase struct

@@ -31,15 +31,13 @@ void importDB(char *fileName){
     Db->structuralMaterialTable = malloc(sizeof(LookupTable));
     Db->neighbourhoodTable = malloc(sizeof(NeighbourhoodTable));
     
-    Db->picnicTableTable = malloc(sizeof(PicnicTable));
 
-    Db->picnicTableTable->capacity = 100;      //change later?
     Db->tableTypeTable->capacity = 3;
     Db->surfaceMaterialTable->capacity = 6;
     Db->structuralMaterialTable->capacity = 5;
     Db->neighbourhoodTable->capacity = 20;      //assumes there's 20 neighbourhoods for now
 
-    //--NOTE: NODES HAVE NOT BEEN IMPLEMENTED YET--
+    //--NOTE: NODES HAVE NOW BEEN IMPLEMENTED--
 
     printf("database: %p\nfile: %s\n", Db, fileName);
 
@@ -57,27 +55,27 @@ void importDB(char *fileName){
         colCount = 0;
         printf("\n");
         
-        
+        PicnicTable *node = malloc(sizeof(PicnicTable));
+        node->capacity = 100;
         
         while (token != NULL & colCount < 10){     //ensures only reads from headers "Id" to "Longitude" in the csv
 
             //change to switch statement?
             if(colCount == 0){                       //assign tableID and siteID
-                Db->picnicTableTable->tableID = uID;
-                Db->picnicTableTable->siteID = atoi(token);
+                node->tableID = uID;
+                node->siteID = atoi(token);
             }   
 
             else if(colCount == 1){                  //assign tableTypeID and add to tableTypeTable
                 //add to tableTypeTable
-                for(i=0; i < 3; i++){            //check array
+                for(i=0; i < Db->tableTypeTable->capacity; i++){            //check array
                     if (Db->tableTypeTable->entries[i] == NULL || strcmp(Db->tableTypeTable->entries[i], token) == 0){ //if this table type is not in the table yet
                         if  (Db->tableTypeTable->entries[i] == NULL){   //only statements that occur if this condition is true
                             Db->tableTypeTable->size++;
                         }
                         Db->tableTypeTable->ids[i] = i;
                         Db->tableTypeTable->entries[i] = malloc(sizeof(char) * 50); //50 to equal neighbourhood table?
-                        //assign tableTypeID
-                        Db->picnicTableTable->tableTypeID = Db->tableTypeTable->ids[i];
+                        node->tableTypeID = Db->tableTypeTable->ids[i];     //assign tableTypeID
                         strcpy(Db->tableTypeTable->entries[i], token);
                         break;
                     }
@@ -93,8 +91,7 @@ void importDB(char *fileName){
                         }
                         Db->surfaceMaterialTable->ids[i] = i;
                         Db->surfaceMaterialTable->entries[i] = malloc(sizeof(char) * 10); //10 since the longest word is "composite"
-                        //assign surfaceID
-                        Db->picnicTableTable->surfaceID = Db->surfaceMaterialTable->ids[i];    
+                        node->surfaceID = Db->surfaceMaterialTable->ids[i];     //assign surfaceID
                         strcpy(Db->surfaceMaterialTable->entries[i], token);
                         break;
                     }
@@ -109,9 +106,8 @@ void importDB(char *fileName){
                             Db->structuralMaterialTable->size++;
                         }
                         Db->structuralMaterialTable->ids[i] = i;
-                        Db->structuralMaterialTable->entries[i] = malloc(sizeof(char) * 10); //10 since the longest word is "composite"
-                        //assign surfaceID
-                        Db->picnicTableTable->structuralID = Db->structuralMaterialTable->ids[i];    
+                        Db->structuralMaterialTable->entries[i] = malloc(sizeof(char) * 10); //10 since the longest word is "composite" 
+                        node->structuralID = Db->structuralMaterialTable->ids[i];   //assign surfaceID
                         strcpy(Db->structuralMaterialTable->entries[i], token);
                         break;
                     }
@@ -120,15 +116,13 @@ void importDB(char *fileName){
             }
             
             else if(colCount == 4){                  //assign streetave
-                strcpy(Db->picnicTableTable->streetave,token);
+                strcpy(node->streetave, token);
             }
             
             else if(colCount == 5){                  //assign hoodID and add to neighbourhoodTable
                 for(i=0; i<100; i++){
                     if(Db->neighbourhoodTable->nID[i] == 0 || Db->neighbourhoodTable->nID[i] == atoi(token)){
-                        //if  (Db->neighbourhoodTable->nID[i] == 0){   //only statements that occur if this condition is true
-                        //}
-                        Db->picnicTableTable->hoodID = atoi(token);     //assign hoodID
+                        node->hoodID = atoi(token);                        //assign hoodID
                         Db->neighbourhoodTable->nID[i] = atoi(token);      //add to neighbourhoodTable
                         Db->neighbourhoodTable->size++;
                         break;
@@ -139,8 +133,6 @@ void importDB(char *fileName){
             else if(colCount == 6){                  //add neighbourhood name
                 for(i=0; i<100; i++){
                     if(Db->neighbourhoodTable->nName[i] == NULL || strcmp(Db->neighbourhoodTable->nName[i],token) == 0){
-                        //if  (Db->neighbourhoodTable->nName[i] == NULL){   //only statements that occur if this condition is true
-                        //}
                         Db->neighbourhoodTable->nName[i] = malloc(sizeof(char) * 50);
                         strcpy(Db->neighbourhoodTable->nName[i],token);
                         break;
@@ -149,15 +141,15 @@ void importDB(char *fileName){
             }
             
             else if(colCount == 7){                  //assign ward
-                strcpy(Db->picnicTableTable->ward, token);
+                strcpy(node->ward, token);
             }
             
             else if(colCount == 8){                  //assign latitude
-                strcpy(Db->picnicTableTable->latitude, token);
+                strcpy(node->latitude, token);
             }
             
             else if(colCount == 9){                  //assign longitude
-                strcpy(Db->picnicTableTable->longitude, token);
+                strcpy(node->longitude, token);
             }
 
             token = strtok(NULL, ",");
@@ -165,24 +157,39 @@ void importDB(char *fileName){
         }
         //here is when a node is finished being made
         uID++;
-        Db->picnicTableTable->size++;
+        node->size++;
+        node->next = NULL;
 
-        //Db->picnicTableTable->next = malloc(sizeof(PicnicTable));
-        //Db->picnicTableTable->next = NULL;
+        //insert node into linked list
+        if (Db->picnicTableTable == NULL){      //if the list is empty, this node is the first one
+            printf("---first!---\n");
+            Db->picnicTableTable = node;
+        }
+        else{                                   //otherwise, probe to the end of the linked list 
+            PicnicTable *p = Db->picnicTableTable;
+            printf("--next!--\n");
+            while(p->next != NULL){
+                p = p->next;
+            }
+            p->next = node;
+            printf("---end---\n");
+        }
 
-        printf("%d\n",Db->picnicTableTable->tableID);
-        printf("capacity:   %d\n",Db->picnicTableTable->capacity);
-        printf("size:       %d\n",Db->picnicTableTable->size);
-        printf("siteID:     %d\n",Db->picnicTableTable->siteID);
-        printf("tableTypeID:%d\n",Db->picnicTableTable->tableTypeID);
-        printf("surfaceID:  %d\n",Db->picnicTableTable->surfaceID);
-        printf("structuralID%d\n",Db->picnicTableTable->structuralID);
-        printf("street/ave: %s\n",Db->picnicTableTable->streetave);
-        printf("hoodID:     %d\n",Db->picnicTableTable->hoodID);
-        printf("ward:       %s\n",Db->picnicTableTable->ward);
-        printf("latitude:   %s\n",Db->picnicTableTable->latitude);
-        printf("longitude:  %s\n",Db->picnicTableTable->longitude);
-        printf("next:       %p\n",Db->picnicTableTable->next);
+        //check nodes
+        printf("%d\n",node->tableID);
+        printf("capacity:   %d\n",node->capacity);
+        printf("size:       %d\n",node->size);
+        printf("siteID:     %d\n",node->siteID);
+        printf("tableTypeID:%d\n",node->tableTypeID);
+        printf("surfaceID:  %d\n",node->surfaceID);
+        printf("structuralID%d\n",node->structuralID);
+        printf("street/ave: %s\n",node->streetave);
+        printf("hoodID:     %d\n",node->hoodID);
+        printf("ward:       %s\n",node->ward);
+        printf("latitude:   %s\n",node->latitude);
+        printf("longitude:  %s\n",node->longitude);
+        printf("next:       %p\n",node->next);
+
         printf("successfully added line!\n");                           //everything works
     }
 
@@ -211,11 +218,19 @@ void importDB(char *fileName){
         printf("%s\n",Db->neighbourhoodTable->nName[i]);
     }
 
-
+    //print all nodes in order
+    PicnicTable *curr = Db->picnicTableTable;
+    while (curr->next != NULL){
+        printf("%d %s\n",curr->tableID, curr->streetave);
+        curr = curr->next;
+    }
+    printf("%d %s\n",curr->tableID, curr->streetave);
     printf("---end importDB()---\n");
 }
 
-//void exportDB(char *fileName){}
+void exportDB(char *fileName){
+    printf("exporting: %s", fileName);
+}
 
 //int countEntries(char *memberName, char *value){}
 
@@ -231,6 +246,7 @@ void importDB(char *fileName){
 int main (void){
     importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
     //importDB("PicnicTableSmall.csv");                                this doesn't work for some reason, the whole file path needs to be written in my case
+    exportDB("test.csv");
 
     return 0;
 }
