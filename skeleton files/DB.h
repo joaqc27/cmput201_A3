@@ -32,12 +32,26 @@
 typedef struct {
     // This struct has members for an ID and for a table type, or
     // surface material, or structural material
+    int capacity;
+    int size;
+
+    int ids[6];        //6 since there is a max of 6 different discrete values
+    char *entries[6];  //make sure to malloc   
+
+    //values are ordered in the order they appear in the large csv file
+    //table type: 0,1,2 -> square, round, other
+    //surface material: 0,1,2,3,4,5 -> wood, composite, aggregate, metal, concrete, unknown
+    //structural material: 0,1,2,3,4 -> aggregate, metal, wood, unknown, concrete
 
 } LookupTable; // used in DataBase struct
 
 typedef struct {
     // This struct has members for a neighbourhood ID and for a neighbourhood name.
+    int capacity;
+    int size;            //number of records?
 
+    int nID[100];        //assuming up to 100 neighbourhoods
+    char *nName[100];    //initializes 100 pointers to 100 neighbourhood names
 } NeighbourhoodTable; // used in DataBase struct
 
 typedef struct {
@@ -45,6 +59,22 @@ typedef struct {
     // table ID, site ID, table type ID, surface material ID,
     // structural material ID, street / avenue,  neighbourhood ID, ward,
     // latitude, longitude, see the assignment specs.
+    int capacity;
+    int size;
+
+    int tableID;        //unique ID; created by application
+    int siteID;         //ID from csv
+    int tableTypeID;    //Table Type Lookup
+    int surfaceID;      //Surface Mat. Lookup
+    int structuralID;   //Structural Mat. Lookup
+   
+    char streetave[50]; //street/avenue from csv
+    int hoodID;          //NeighbourhoodTable <- must be related to table somehow? maybe by initializing
+    char ward[30];      //Ward from csv
+    char latitude[50];  //Latitude from csv
+    char longitude[50]; //Longitude from csv
+
+    void *next;         //points to the next node
 
 } PicnicTable; // used in DataBase struct
 

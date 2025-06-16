@@ -8,6 +8,8 @@ Purpose: Hold information regarding the design of the PicnicTable Database
 -----------------
 
 Design of PicnicTable Database:
-    -g
+    -the entire database will consist of a basic linked list, each with a value and pointer
+    -the value of every node will be a PicnicTable struct, representing an entry in the csv file
     Designing the four database tables (array, struct or linked list)?
-        -
+        -each of the four database tables will be a struct, each with capacity and size members, then name and id members for their respective attributes
+    
