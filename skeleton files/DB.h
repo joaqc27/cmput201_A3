@@ -73,8 +73,8 @@ typedef struct {
     char longitude[50]; //Longitude from csv
 
     //additional members added for implementation
-    int capacity;
-    int size;
+    //int capacity;
+    //int size;
     void *next;         //points to the next node
 
     char neighName[100]; 
@@ -88,6 +88,7 @@ typedef struct {
     // current capacity and the current size (number of records) of each of
     // these five tables. You can add anything you see fit here.
     char headBuffer[200];
+    int linkedSize;
 
     LookupTable *tableTypeTable;
     LookupTable *surfaceMaterialTable;

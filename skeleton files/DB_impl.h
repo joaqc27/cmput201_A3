@@ -24,9 +24,6 @@
 */
 char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID);
 
-//does the above but with the actual name
-int findNeighbourhoodName(NeighbourhoodTable *tablep, char *neighname);
-
 /*
     Purpose:    Looks for the corresponding tableID in the tableType lookup table given the table type given 
     Parameters: tablep (LookupTable pointer): to reference the LookupTable being searched in, tableType (string): to target the tableID to be returned
@@ -35,6 +32,79 @@ int findNeighbourhoodName(NeighbourhoodTable *tablep, char *neighname);
     Returns:    The tableID of the given table type
 */
 int fetchTable(LookupTable *tablep, char *tableType);
+
+
+/*
+    Purpose:    Turn the Database's Linked List of PicnicTable structs into an array for qsort
+    Parameters: Db (Database pointer): to reference the global variable Db (isn't really necessary?), 
+    Pre:        Requires all structs Database requires and requires the Database to exist
+    Post:       Changes the linked list to an array
+    Returns:    A pointer to the first element of the array of PicnicTable Structs
+*/
+PicnicTable* linkedToArray(DataBase *Db, int linkedSize);
+
+/*
+    Purpose:    Comparison function that returns values based on TableTypeID
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
+*/
+int compareTableType(const void *a, const void *b);
+
+/*
+    Purpose:    Comparison function that returns values based on surfaceID
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
+*/
+int compareSurfaceMat(const void *a, const void *b);
+
+/*
+    Purpose:    
+    Parameters: 
+    Pre:        
+    Post:       
+    Returns:    
+*/
+int compareStructMat(const void *a, const void *b);
+
+/*
+    Purpose:    
+    Parameters: 
+    Pre:        
+    Post:       
+    Returns:    
+*/
+int compareHoodID(const void *a, const void *b);
+
+/*
+    Purpose:    
+    Parameters: 
+    Pre:        
+    Post:       
+    Returns:    
+*/
+int compareNeighName(const void *a, const void *b);
+
+/*
+    Purpose:    
+    Parameters: 
+    Pre:        
+    Post:       
+    Returns:    
+*/
+int compareWard(const void *a, const void *b);
+
+/*
+    Purpose:    
+    Parameters: 
+    Pre:        
+    Post:       
+    Returns:    
+*/
+void arrayToLinked(PicnicTable *array);
 
 /*
  * You may consider helper functions for the following tasks. Additional helper

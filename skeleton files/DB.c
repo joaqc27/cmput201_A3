@@ -31,6 +31,7 @@ void importDB(char *fileName){
     Db->structuralMaterialTable = malloc(sizeof(LookupTable));
     Db->neighbourhoodTable = malloc(sizeof(NeighbourhoodTable));
 
+    Db->linkedSize = 0;
     Db->tableTypeTable->capacity = 3;
     Db->surfaceMaterialTable->capacity = 6;
     Db->structuralMaterialTable->capacity = 5;
@@ -55,7 +56,6 @@ void importDB(char *fileName){
         //printf("\n");
         
         PicnicTable *node = malloc(sizeof(PicnicTable));
-        node->capacity = 100;
         
         while (token != NULL & colCount < 10){     //ensures only reads from headers "Id" to "Longitude" in the csv
 
@@ -160,7 +160,7 @@ void importDB(char *fileName){
         }
         //here is when a node is finished being made
         uID++;
-        node->size++;
+        Db->linkedSize++;
         node->next = NULL;
 
         //insert node into linked list
@@ -225,7 +225,7 @@ void importDB(char *fileName){
     //print all nodes in order (also place in testing)
     PicnicTable *curr = Db->picnicTableTable;
     while (curr->next != NULL){
-        printf("%d %s\n",curr->tableID, curr->streetave);
+        printf("[%d] %d %s\n",Db->linkedSize,curr->tableID, curr->streetave);
         curr = curr->next;
     }
     printf("%d %s\n",curr->tableID, curr->streetave);
@@ -253,6 +253,83 @@ int fetchTable(LookupTable *tablep, char *tabletype){
         }
     }
     return 0;
+}
+
+PicnicTable* linkedToArray(DataBase *Db, int linkedSize){
+    int i;
+    PicnicTable *p = Db->picnicTableTable;    
+    PicnicTable* newArray = malloc(sizeof(PicnicTable) * linkedSize);
+
+    for (i=0; i < linkedSize; i++){
+        newArray[i] = *p;
+        newArray[i].next = NULL;
+        p = p->next;
+    }
+    return newArray;
+}
+
+int compareTableType(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    
+    if (valA->tableTypeID > valB->tableTypeID){return 1;}
+    else if (valA->tableTypeID == valB->tableTypeID){return 0;}
+    else if (valA->tableTypeID < valB->tableTypeID) {return -1;}
+    else {return -2;}
+}
+
+int compareSurfaceMat(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    
+    if (valA->surfaceID > valB->surfaceID){return 1;}
+    else if (valA->surfaceID == valB->surfaceID){return 0;}
+    else if (valA->surfaceID < valB->surfaceID) {return -1;}
+    else {return -2;}
+}
+
+int compareStructMat(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    
+    if (valA->structuralID > valB->structuralID){return 1;}
+    else if (valA->structuralID == valB->structuralID){return 0;}
+    else if (valA->structuralID < valB->structuralID) {return -1;}
+    else {return -2;}
+}
+
+int compareHoodID(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    
+    if (valA->hoodID > valB->hoodID){return 1;}
+    else if (valA->hoodID == valB->hoodID){return 0;}
+    else if (valA->hoodID < valB->hoodID) {return -1;}
+    else {return -2;}
+}
+
+int compareNeighName(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    int verdict;
+
+    verdict = strcmp(valA->neighName,valB->neighName);
+    if (verdict > 0){return 1;}
+    else if (verdict == 0){return 0;}
+    else if (verdict < 0){return -1;}
+    else{return -2;}
+}
+
+int compareWard(const void *a, const void *b){
+    const PicnicTable *valA = (PicnicTable*) a;
+    const PicnicTable *valB = (PicnicTable*) b;
+    int verdict;
+
+    verdict = strcmp(valA->ward,valB->ward);
+    if (verdict > 0){return 1;}
+    else if (verdict == 0){return 0;}
+    else if (verdict < 0){return -1;}
+    else{return -2;}
 }
 
 //--NOTE: move these function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
@@ -373,13 +450,109 @@ int countEntries(char *memberName, char *value){
     }
 }
 
-//void sortByMember(char *memberName){}
+void sortByMember(char *memberName){
+    PicnicTable *p = Db->picnicTableTable;
+    int linkedSize;
+    
+    //to use qsort, make linked list into an array (helper function?), sort it, then turn back into linked list
+    PicnicTable *newArray = linkedToArray(Db, Db->linkedSize);
+
+    linkedSize = Db->linkedSize;
+    printf("linked size: %d\n", linkedSize);
+
+    //Table Type (works)
+    if (strcmp(memberName, "Table Type") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable),compareTableType);
+        //for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].tableTypeID);}
+    }
+
+    //Surface Material (works)
+    else if (strcmp(memberName, "Surface Material") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable), compareSurfaceMat);
+        //for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].surfaceID);}
+    }
+
+    //Structural Material (works)
+    else if (strcmp(memberName, "Structural Material") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable), compareStructMat);
+        for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].structuralID);}
+    }
+
+    //Neighbourhood ID (works)
+    else if (strcmp(memberName, "Neighbourhood Id") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable), compareHoodID);
+        for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].hoodID);}
+    }
+
+    //Neighbourhood Name (works)
+    else if (strcmp(memberName, "Neighbourhood Name") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable), compareNeighName);
+        for (int i=0; i < linkedSize; i++){printf("%s\n", newArray[i].neighName);}
+    }
+
+    //Ward
+    else if (strcmp(memberName, "Ward") == 0){
+        printf("sorting: %s\n", memberName);
+        qsort(newArray,linkedSize,sizeof(PicnicTable), compareWard);
+        for (int i=0; i < linkedSize; i++){printf("%s\n", newArray[i].ward);}
+    }
+
+    //turn back into linked list
+    PicnicTable *np;
+
+    //clear Db linked list
+    //freeDB();
+
+    //initialize Db linked list
+    
+
+
+    //write the database to a .csv named after sorting member 
+    //export(memberName);
+}
 
 //void compressDB(char *filename){}
 
 //void unCompressDB(char *filename){}
 
-//void freeDB(void);
+void freeDB(void){
+    int i,e;
+    PicnicTable *p = Db->picnicTableTable;
+    for (i=0; i < 6; i++){
+        free(Db->tableTypeTable->entries[i]);
+        free(Db->surfaceMaterialTable->entries[i]);
+        free(Db->structuralMaterialTable->entries[i]);
+    }
+    free(Db->tableTypeTable);
+    free(Db->surfaceMaterialTable);
+    free(Db->structuralMaterialTable);
+
+    for (i=0; i < 100; i++){
+        free(Db->neighbourhoodTable->nName[i]);
+    }
+    free(Db->neighbourhoodTable);
+
+    //free PicnicTable nodes
+    while(p->next != NULL){
+        PicnicTable *next = p->next;
+        free(p->streetave);
+        free(p->ward);
+        free(p->latitude);
+        free(p->longitude);
+        free(p->neighName);
+        free(p->location);
+        free(p->geoPoint);
+        free(p);
+        p = next;
+    }
+    //free(Db->headBuffer);       //free headBuffer
+    //free(Db);                   //free Db
+}
 
 //test main function (for vsCode, delete later)
 int main (void){
@@ -395,6 +568,14 @@ int main (void){
     //int count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
     //int count = countEntries("Ward","Ward Karhiio");
     //printf("count: %d\n",count);
+
+    //testing sortByMember() - all works
+    sortByMember("Table Type"); 
+    //sortByMember("Surface Material"); 
+    //sortByMember("Structural Material");
+    //sortByMember("Neighbourhood Id");
+    //sortByMember("Neighbourhood Name");
+    //sortByMember("Ward");
 
     return 0;
 }
