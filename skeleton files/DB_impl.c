@@ -22,4 +22,12 @@ char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID){
         }
     }
 }
+
+int fetchTable(LookupTable *tablep, char *tabletype){
+    for (int i=0; i < tablep->size; i++){
+        if(strcmp(tabletype,tablep->entries[i]) == 0){
+            return tablep->ids[i];
+        }
+    }
+}
 */

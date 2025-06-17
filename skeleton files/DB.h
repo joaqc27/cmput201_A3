@@ -77,6 +77,7 @@ typedef struct {
     int size;
     void *next;         //points to the next node
 
+    char neighName[100]; 
     char location[100]; //combines latitude, longitude
     char geoPoint[100]; //POINT(longitude + latitude)
 

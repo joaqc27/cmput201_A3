@@ -134,6 +134,7 @@ void importDB(char *fileName){
                     if(Db->neighbourhoodTable->nName[i] == NULL || strcmp(Db->neighbourhoodTable->nName[i],token) == 0){
                         Db->neighbourhoodTable->nName[i] = malloc(sizeof(char) * 50);
                         strcpy(Db->neighbourhoodTable->nName[i],token);
+                        strcpy(node->neighName,token);
                         break;
                     }
                 }
@@ -233,15 +234,29 @@ void importDB(char *fileName){
 }
 
 
-//NOTE: move this function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
+//--NOTE: move these function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
 char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID){
     int i;
+    char *error = NULL;
     for(i=0; i < tablep->size; i++){
         if(hoodID == tablep->nID[i]){
             return tablep->nName[i];
         }
     }
+    return error;
 }
+
+int fetchTable(LookupTable *tablep, char *tabletype){
+    for (int i=0; i < tablep->size; i++){
+        if(strcmp(tabletype,tablep->entries[i]) == 0){
+            return tablep->ids[i];
+        }
+    }
+    return 0;
+}
+
+//--NOTE: move these function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
+
 
 void exportDB(char *fileName){          //takes database and turns back into a csv file
     FILE *fp;
@@ -250,7 +265,7 @@ void exportDB(char *fileName){          //takes database and turns back into a c
     fp = fopen(fileName, "w+");
 
     //write header to file
-    fprintf(fp,Db->headBuffer);
+    fprintf(fp,"%s",Db->headBuffer);
 
     //write every entry to file
     while(curr->next != NULL){
@@ -277,7 +292,86 @@ void exportDB(char *fileName){          //takes database and turns back into a c
     return;
 }
 
-//int countEntries(char *memberName, char *value){}
+int countEntries(char *memberName, char *value){
+    PicnicTable *p = Db->picnicTableTable;
+    int count = 0;
+    int translatedVal;
+    if (p == NULL){     //check if the list is empty 
+        printf("Database empty.\n");
+        exit(EXIT_FAILURE);
+    }
+
+    //membernames: Table Type (works)
+    if (strcmp(memberName,"Table Type") == 0){
+        translatedVal = fetchTable(Db->tableTypeTable,value);
+        //printf("translated val: %d\n", translatedVal);
+        while(p->next != NULL){
+            if (p->tableTypeID == translatedVal){count++;}
+            p = p->next;
+        }
+        if (p->tableTypeID == translatedVal){count++;}  //check last line
+        return count;
+
+    }
+    //Surface Material (works)
+    if (strcmp(memberName, "Surface Material") == 0){
+        translatedVal = fetchTable(Db->surfaceMaterialTable,value);
+        printf("translated val: %d\n", translatedVal);
+        while (p->next != NULL){
+            if (p->surfaceID == translatedVal){count++;}
+            p = p->next;
+        }
+        if (p->surfaceID == translatedVal){count++;}  //check last line
+        return count;
+    }
+    //Structural Material (works)
+    if (strcmp(memberName, "Structural Material") == 0){
+        translatedVal = fetchTable(Db->structuralMaterialTable,value);
+        printf("translated val: %d\n", translatedVal);
+        while (p->next != NULL){
+            if(p->structuralID == translatedVal){count++;}
+            p = p->next;
+        }
+        if (p->structuralID == translatedVal){count++;}
+        return count;
+    }
+
+    //Neighbourhood ID  (works)
+    if (strcmp(memberName, "Neighbourhood Id") == 0){
+        printf("translated val: %d\n", atoi(value));
+        while(p->next != NULL){
+            if(p->hoodID == atoi(value)){count++;}
+            p = p->next;
+        }
+        if(p->hoodID == atoi(value)){count++;}
+        return count;
+    }
+
+    //Neighbourhood Name (works)
+    if (strcmp(memberName, "Neighbourhood Name") == 0){
+        printf("translated val: %s\n", value);
+        while(p->next != NULL){
+            if(strcmp(p->neighName,value) == 0){count++;}
+            p = p->next;
+        }
+        if(strcmp(p->neighName,value) == 0){count++;}
+        return count;
+    }
+
+    //Ward (works)
+    if (strcmp(memberName, "Ward") == 0){
+        printf("translated val: %s\n", value);
+        while(p->next != NULL){
+            if(strcmp(p->ward,value) == 0){count++;}
+            p = p->next;
+        }
+        if(strcmp(p->ward,value) == 0){count++;}
+        return count;
+    }
+    else{
+        return count;
+    }
+}
 
 //void sortByMember(char *memberName){}
 
@@ -292,6 +386,15 @@ int main (void){
     importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
     //importDB("PicnicTableSmall.csv");                                this doesn't work for some reason, the whole file path needs to be written in my case
     exportDB("test.csv");
+
+    //testing countEntries()
+    //int count = countEntries("Table Type","Square Picnic Table");
+    //int count = countEntries("Surface Material","Composite");
+    //int count = countEntries("Structural Material", "Metal");
+    //int count = countEntries("Neighbourhood Id", "2630");
+    //int count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
+    //int count = countEntries("Ward","Ward Karhiio");
+    //printf("count: %d\n",count);
 
     return 0;
 }

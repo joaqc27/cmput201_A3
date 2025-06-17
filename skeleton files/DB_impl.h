@@ -24,6 +24,18 @@
 */
 char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID);
 
+//does the above but with the actual name
+int findNeighbourhoodName(NeighbourhoodTable *tablep, char *neighname);
+
+/*
+    Purpose:    Looks for the corresponding tableID in the tableType lookup table given the table type given 
+    Parameters: tablep (LookupTable pointer): to reference the LookupTable being searched in, tableType (string): to target the tableID to be returned
+    Pre:        Requires LookupTable struct to exist
+    Post:       None
+    Returns:    The tableID of the given table type
+*/
+int fetchTable(LookupTable *tablep, char *tableType);
+
 /*
  * You may consider helper functions for the following tasks. Additional helper
  * functions may be needed.
