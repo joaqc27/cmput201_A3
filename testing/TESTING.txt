@@ -1,0 +1,25 @@
+-----------------
+Authors: Joaquin Carbonell, Jigarjeet Mannan
+Class: CMPT201 Assignment 3
+Lab instructor: Dr. Philip Mees
+Lecture instructor: Dr. Philip Mees
+Purpose: Hold information regarding the Testing aspect of the PicnicTable Database
+-----------------
+
+Testing Each of the 7 Functions in DB.c
+
+1. importDB()
+    - implementation of the Database from a .csv file is tested by comparing printing statements of Lookup Tables to expected output of the Lookup Tables, and comparing printing statements of the Picnic Table Linked List to the expected outputs
+    - the expected outputs of the lookup tables and main PicnicTable database are found in importDBOutput.txt
+    - input: PicnicTableSmall.csv
+    - output: 
+
+2. exportDB()
+    - testing exportDB() will be tested by running a diff command on the function's output file and PicnicTableSmall.csv
+    - 
+
+3. countEntries()
+4. sortByMember()
+5. compressDB()
+6. unCompressDB()
+7. freeDB()

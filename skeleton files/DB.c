@@ -20,7 +20,7 @@ DataBase *Db; /* definition of the main database variable */ //is a global varia
 void importDB(char *fileName){
     FILE *fp;
     char testBuffer[1000];  
-    char headBuffer[200];
+    
     int i=0, colCount, uID=0;
     
     //initialize database
@@ -30,7 +30,6 @@ void importDB(char *fileName){
     Db->surfaceMaterialTable = malloc(sizeof(LookupTable));
     Db->structuralMaterialTable = malloc(sizeof(LookupTable));
     Db->neighbourhoodTable = malloc(sizeof(NeighbourhoodTable));
-    
 
     Db->tableTypeTable->capacity = 3;
     Db->surfaceMaterialTable->capacity = 6;
@@ -48,12 +47,12 @@ void importDB(char *fileName){
         exit(EXIT_FAILURE);
     }
 
-    fgets(headBuffer,200,fp);                   //skip reading the header columns
+    fgets(Db->headBuffer,200,fp);                   //skip reading the header columns
 
     while(fgets(testBuffer,1000,fp)){           //read line by line (this is where a new node starts)
         char *token = strtok(testBuffer, ",");
         colCount = 0;
-        printf("\n");
+        //printf("\n");
         
         PicnicTable *node = malloc(sizeof(PicnicTable));
         node->capacity = 100;
@@ -150,6 +149,9 @@ void importDB(char *fileName){
             
             else if(colCount == 9){                  //assign longitude
                 strcpy(node->longitude, token);
+                //then assign location and geometry point for exportDB(), but just don't print it anywhere
+                sprintf(node->location, "\"(%s, %s)\"", node->latitude, node->longitude);
+                sprintf(node->geoPoint, "POINT (%s %s)", node->longitude, node->latitude);
             }
 
             token = strtok(NULL, ",");
@@ -162,20 +164,21 @@ void importDB(char *fileName){
 
         //insert node into linked list
         if (Db->picnicTableTable == NULL){      //if the list is empty, this node is the first one
-            printf("---first!---\n");
+            //printf("---first!---\n");
             Db->picnicTableTable = node;
         }
         else{                                   //otherwise, probe to the end of the linked list 
             PicnicTable *p = Db->picnicTableTable;
-            printf("--next!--\n");
+            //printf("--next!--\n");
             while(p->next != NULL){
                 p = p->next;
             }
             p->next = node;
-            printf("---end---\n");
+            //printf("---end---\n");
         }
 
         //check nodes
+        /*
         printf("%d\n",node->tableID);
         printf("capacity:   %d\n",node->capacity);
         printf("size:       %d\n",node->size);
@@ -189,11 +192,11 @@ void importDB(char *fileName){
         printf("latitude:   %s\n",node->latitude);
         printf("longitude:  %s\n",node->longitude);
         printf("next:       %p\n",node->next);
-
         printf("successfully added line!\n");                           //everything works
+        */
     }
 
-    //print lookup tables
+    //print lookup tables (place in testing?)
     printf("\n---tableTypeLookupTable---\ncapacity = %d, size = %d\n",Db->tableTypeTable->capacity, Db->tableTypeTable->size);
     for (i=0; i < Db->tableTypeTable->capacity; i++){
         printf("%d ",Db->tableTypeTable->ids[i]);
@@ -218,18 +221,60 @@ void importDB(char *fileName){
         printf("%s\n",Db->neighbourhoodTable->nName[i]);
     }
 
-    //print all nodes in order
+    //print all nodes in order (also place in testing)
     PicnicTable *curr = Db->picnicTableTable;
     while (curr->next != NULL){
         printf("%d %s\n",curr->tableID, curr->streetave);
         curr = curr->next;
     }
     printf("%d %s\n",curr->tableID, curr->streetave);
+    fclose(fp);
     printf("---end importDB()---\n");
 }
 
-void exportDB(char *fileName){
-    printf("exporting: %s", fileName);
+
+//NOTE: move this function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
+char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID){
+    int i;
+    for(i=0; i < tablep->size; i++){
+        if(hoodID == tablep->nID[i]){
+            return tablep->nName[i];
+        }
+    }
+}
+
+void exportDB(char *fileName){          //takes database and turns back into a csv file
+    FILE *fp;
+    PicnicTable *curr = Db->picnicTableTable;
+    //int i;
+    fp = fopen(fileName, "w+");
+
+    //write header to file
+    fprintf(fp,Db->headBuffer);
+
+    //write every entry to file
+    while(curr->next != NULL){
+        //binary write
+        fprintf(fp,"%d,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s\n",curr->siteID,
+        Db->tableTypeTable->entries[curr->tableTypeID],
+        Db->surfaceMaterialTable->entries[curr->surfaceID], 
+        Db->structuralMaterialTable->entries[curr->structuralID],
+        curr->streetave,
+        curr->hoodID,
+        fetchNeighbourhood(Db->neighbourhoodTable, curr->hoodID),
+        curr->ward,
+        curr->latitude,
+        curr->longitude,
+        curr->location,
+        curr->geoPoint);
+        
+        curr = curr->next;
+    }
+    //write last line
+    fprintf(fp,"%d,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s\n",curr->siteID,Db->tableTypeTable->entries[curr->tableTypeID],Db->surfaceMaterialTable->entries[curr->surfaceID], Db->structuralMaterialTable->entries[curr->structuralID],curr->streetave,curr->hoodID,fetchNeighbourhood(Db->neighbourhoodTable, curr->hoodID),curr->ward,curr->latitude,curr->longitude,curr->location,curr->geoPoint);
+    fclose(fp);
+    printf("---successfully exported %s---\n",fileName);
+    return;
 }
 
 //int countEntries(char *memberName, char *value){}

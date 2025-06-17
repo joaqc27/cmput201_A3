@@ -15,6 +15,14 @@
 
 #ifndef DB_IMPL_H
 #define DB_IMPL_H
+/*
+    Purpose:    Looks for the corresponding neighbourhood name in the neighbourhood lookup table given the ID 
+    Parameters: tablep (LookupTable pointer): to reference the LookupTable being searched in, hoodID (int): to target the neighbourhood name to be found
+    Pre:        Requires LookupTable struct to exist
+    Post:       None
+    Returns:    A pointer to the corresponding neighbourhood name 
+*/
+char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID);
 
 /*
  * You may consider helper functions for the following tasks. Additional helper

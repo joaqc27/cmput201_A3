@@ -11,4 +11,15 @@
 #include "DB.h"       /* Import the public database header. */
 #include "DB_impl.h"  /* Import the private database header */
 
-// Awesome sauce
+//full function definition being developed/tested in DB.c, but for full submission, this should be uncommented and the one in DB.c should be deleted
+
+/*
+char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID){
+    int i;
+    for(i=0; i < tablep->size; i++){
+        if(hoodID == tablep->nID[i]){
+            return tablep->nName[i];
+        }
+    }
+}
+*/

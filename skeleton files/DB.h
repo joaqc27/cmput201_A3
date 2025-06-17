@@ -77,12 +77,16 @@ typedef struct {
     int size;
     void *next;         //points to the next node
 
+    char location[100]; //combines latitude, longitude
+    char geoPoint[100]; //POINT(longitude + latitude)
+
 } PicnicTable; // used in DataBase struct
 
 typedef struct {
     // This struct has members for each of the five database tables, and for the
     // current capacity and the current size (number of records) of each of
     // these five tables. You can add anything you see fit here.
+    char headBuffer[200];
 
     LookupTable *tableTypeTable;
     LookupTable *surfaceMaterialTable;
