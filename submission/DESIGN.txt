@@ -31,3 +31,21 @@ Design of UnCompression:
         - Rebuild the linked lists by connecting nodes
     - Use malloc for memory allocation
     - Linked lists reconnection by using the "prev" pointer
+
+    - Linked lists reconnection by using the "prev" pointer
+
+Design of Free:
+    - The freeDB() function properly deallocates all dynamically allocated
+    memory used by the database to prevent memory leaks.
+    - Frees: Lookup tables, Neighbourhood table, PicnicTable linked lists
+    Memory Deallocation Strategy:
+        Lookup Tables
+        - Each lookup table contains dynamically allocated strings (entries[i])
+        - These are freed in a loop using the table's size
+        - After freeing entries, the table structs are freed
+
+        Neighbourhood Table
+        - Dynamically allocated strings (nName[i]) are freed based on the table's size
+
+        PicnicTable Linked List
+        - Each node is traversed and freed using current/next pointers

@@ -779,35 +779,44 @@ void unCompressDB(char *filename){
 
 void freeDB(void){
     int i;
-    //int e;
-    PicnicTable *p = Db->picnicTableTable;
-    for (i=0; i < 6; i++){
+    PicnicTable *current = Db->picnicTableTable;
+    PicnicTable *next;
+
+    // Free Lookup Tables
+    // Table Type Table
+    for (i = 0; i < Db->tableTypeTable->size; i++) {
         free(Db->tableTypeTable->entries[i]);
-        free(Db->surfaceMaterialTable->entries[i]);
-        free(Db->structuralMaterialTable->entries[i]);
     }
     free(Db->tableTypeTable);
+
+    // Surface Table
+    for (i = 0; i < Db->surfaceMaterialTable->size; i++) {
+        free(Db->surfaceMaterialTable->entries[i]);
+    }
     free(Db->surfaceMaterialTable);
+
+    // Structural Table
+    for (i = 0; i < Db->structuralMaterialTable->size; i++) {
+        free(Db->structuralMaterialTable->entries[i]);
+    }
     free(Db->structuralMaterialTable);
 
-    for (i=0; i < 100; i++){
+    // Free Neighbourhood Table
+    for (i = 0; i < Db->neighbourhoodTable->size; i++) {
         free(Db->neighbourhoodTable->nName[i]);
     }
     free(Db->neighbourhoodTable);
 
-    //free PicnicTable nodes
-    while(p->next != NULL){
-        PicnicTable *next = p->next;
-        free(p->streetave);
-        free(p->ward);
-        free(p->latitude);
-        free(p->longitude);
-        free(p->neighName);
-        free(p->location);
-        free(p->geoPoint);
-        free(p);
-        p = next;
+    // Free PicnicTable linked list
+    while (current != NULL) {
+        next = current->next;
+        free(current);
+        current = next;
     }
+
+    // Finally free the database structure itself
+    free(Db);
+
     //free(Db->headBuffer);       //free headBuffer
     //free(Db);                   //free Db
 }
