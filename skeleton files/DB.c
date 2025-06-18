@@ -161,6 +161,10 @@ void importDB(char *fileName){
         //here is when a node is finished being made
         uID++;
         Db->linkedSize++;
+        //no resizing is necessary since its a linked list, just update capacity as you go
+        if (Db->linkedSize >= Db->currCapacity){
+            Db->currCapacity = Db->linkedSize;
+        }
         node->next = NULL;
 
         //insert node into linked list
@@ -451,7 +455,7 @@ int countEntries(char *memberName, char *value){
 }
 
 void sortByMember(char *memberName){
-    PicnicTable *p = Db->picnicTableTable;
+    //PicnicTable *p = Db->picnicTableTable;
     int linkedSize;
     
     //to use qsort, make linked list into an array (helper function?), sort it, then turn back into linked list
@@ -504,24 +508,242 @@ void sortByMember(char *memberName){
 
     //turn back into linked list
     PicnicTable *np;
+    PicnicTable* firstNode = arrayToLinked(newArray);
 
     //clear Db linked list
-    //freeDB();
-
+    
     //initialize Db linked list
     
-
-
     //write the database to a .csv named after sorting member 
     //export(memberName);
 }
+void compressDB(char *filename){
+    FILE *fp = fopen(filename, "wb");
+    if (fp == NULL) {
+        printf("Failed");
+        exit(EXIT_FAILURE);
+    }
 
-//void compressDB(char *filename){}
+    // Table
+    fwrite(&Db->tableTypeTable->size, sizeof(int), 1, fp);
+    for (int i = 0; i < Db->tableTypeTable->size; i++) {
+        int len = strlen(Db->tableTypeTable->entries[i]) + 1;
+        fwrite(&Db->tableTypeTable->ids[i], sizeof(int), 1, fp);
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(Db->tableTypeTable->entries[i], sizeof(char), len, fp);
+    }
 
-//void unCompressDB(char *filename){}
+    // Surface Table
+    fwrite(&Db->surfaceMaterialTable->size, sizeof(int), 1, fp);
+    for (int i = 0; i < Db->surfaceMaterialTable->size; i++) {
+        int len = strlen(Db->surfaceMaterialTable->entries[i]) + 1;
+        fwrite(&Db->surfaceMaterialTable->ids[i], sizeof(int), 1, fp);
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(Db->surfaceMaterialTable->entries[i], sizeof(char), len, fp);
+    }
+
+    // Structural Table
+    fwrite(&Db->structuralMaterialTable->size, sizeof(int), 1, fp);
+    for (int i = 0; i < Db->structuralMaterialTable->size; i++) {
+        int len = strlen(Db->structuralMaterialTable->entries[i]) + 1;
+        fwrite(&Db->structuralMaterialTable->ids[i], sizeof(int), 1, fp);
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(Db->structuralMaterialTable->entries[i], sizeof(char), len, fp);
+    }
+
+    // Neighbourhood Table
+    fwrite(&Db->neighbourhoodTable->size, sizeof(int), 1, fp);
+    for (int i = 0; i < Db->neighbourhoodTable->size; i++) {
+        int len = strlen(Db->neighbourhoodTable->nName[i]) + 1;
+        fwrite(&Db->neighbourhoodTable->nID[i], sizeof(int), 1, fp);
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(Db->neighbourhoodTable->nName[i], sizeof(char), len, fp);
+    }
+
+    // Write PicnicTable (linked list)
+    int count = 0;
+    PicnicTable *curr = Db->picnicTableTable;
+    while (curr != NULL) {
+        count++;
+        curr = curr->next;
+    }
+    fwrite(&count, sizeof(int), 1, fp);
+
+    curr = Db->picnicTableTable;
+    while (curr != NULL) {
+        // Write fixed-size members
+        fwrite(&curr->tableID, sizeof(int), 1, fp);
+        fwrite(&curr->siteID, sizeof(int), 1, fp);
+        fwrite(&curr->tableTypeID, sizeof(int), 1, fp);
+        fwrite(&curr->surfaceID, sizeof(int), 1, fp);
+        fwrite(&curr->structuralID, sizeof(int), 1, fp);
+        fwrite(&curr->hoodID, sizeof(int), 1, fp);
+
+        // Write strings with lengths
+        int len = strlen(curr->streetave) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->streetave, sizeof(char), len, fp);
+
+        len = strlen(curr->ward) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->ward, sizeof(char), len, fp);
+
+        len = strlen(curr->latitude) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->latitude, sizeof(char), len, fp);
+
+        len = strlen(curr->longitude) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->longitude, sizeof(char), len, fp);
+
+        len = strlen(curr->neighName) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->neighName, sizeof(char), len, fp);
+
+        len = strlen(curr->location) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->location, sizeof(char), len, fp);
+
+        len = strlen(curr->geoPoint) + 1;
+        fwrite(&len, sizeof(int), 1, fp);
+        fwrite(curr->geoPoint, sizeof(char), len, fp);
+
+        curr = curr->next;
+    }
+
+    fclose(fp);
+    printf("Database compressed to %s\n", filename);
+
+    //freeDB()?
+}
+
+void unCompressDB(char *filename){
+    FILE *fp = fopen(filename, "rb");
+    if (fp == NULL) {
+        printf("Failed");
+        exit(EXIT_FAILURE);
+    }
+
+    // Initialize database
+    Db = malloc(sizeof(DataBase));
+    Db->tableTypeTable = malloc(sizeof(LookupTable));
+    Db->surfaceMaterialTable = malloc(sizeof(LookupTable));
+    Db->structuralMaterialTable = malloc(sizeof(LookupTable));
+    Db->neighbourhoodTable = malloc(sizeof(NeighbourhoodTable));
+    Db->picnicTableTable = NULL;
+
+    // Read lookup tables
+    int size;
+    fread(&size, sizeof(int), 1, fp);
+    Db->tableTypeTable->size = size;
+    Db->tableTypeTable->capacity = size;
+
+    for (int i = 0; i < size; i++) {
+        fread(&Db->tableTypeTable->ids[i], sizeof(int), 1, fp);
+        int len;
+        fread(&len, sizeof(int), 1, fp);
+        Db->tableTypeTable->entries[i] = malloc(len);
+        fread(Db->tableTypeTable->entries[i], sizeof(char), len, fp);
+    }
+
+    // Surface Table
+    fread(&size, sizeof(int), 1, fp);
+    Db->surfaceMaterialTable->size = size;
+    Db->surfaceMaterialTable->capacity = size;
+
+    for (int i = 0; i < size; i++) {
+        fread(&Db->surfaceMaterialTable->ids[i], sizeof(int), 1, fp);
+        int len;
+        fread(&len, sizeof(int), 1, fp);
+        Db->surfaceMaterialTable->entries[i] = malloc(len);
+        fread(Db->surfaceMaterialTable->entries[i], sizeof(char), len, fp);
+    }
+
+    // Structural Table
+    fread(&size, sizeof(int), 1, fp);
+    Db->structuralMaterialTable->size = size;
+    Db->structuralMaterialTable->capacity = size;
+
+    for (int i = 0; i < size; i++) {
+        fread(&Db->structuralMaterialTable->ids[i], sizeof(int), 1, fp);
+        int len;
+        fread(&len, sizeof(int), 1, fp);
+        Db->structuralMaterialTable->entries[i] = malloc(len);
+        fread(Db->structuralMaterialTable->entries[i], sizeof(char), len, fp);
+    }
+
+    // Neighbourhood Table
+    fread(&size, sizeof(int), 1, fp);
+    Db->neighbourhoodTable->size = size;
+    Db->neighbourhoodTable->capacity = size;
+
+    for (int i = 0; i < size; i++) {
+        fread(&Db->neighbourhoodTable->nID[i], sizeof(int), 1, fp);
+        int len;
+        fread(&len, sizeof(int), 1, fp);
+        Db->neighbourhoodTable->nName[i] = malloc(len);
+        fread(Db->neighbourhoodTable->nName[i], sizeof(char), len, fp);
+    }
+
+    // Read PicnicTable (linked list)
+    int count;
+    fread(&count, sizeof(int), 1, fp);
+
+    PicnicTable *prev = NULL;
+    for (int i = 0; i < count; i++) {
+        PicnicTable *node = malloc(sizeof(PicnicTable));
+
+        // Read fixed members
+        fread(&node->tableID, sizeof(int), 1, fp);
+        fread(&node->siteID, sizeof(int), 1, fp);
+        fread(&node->tableTypeID, sizeof(int), 1, fp);
+        fread(&node->surfaceID, sizeof(int), 1, fp);
+        fread(&node->structuralID, sizeof(int), 1, fp);
+        fread(&node->hoodID, sizeof(int), 1, fp);
+
+        // Read strings with their lengths
+        int len;
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->streetave, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->ward, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->latitude, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->longitude, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->neighName, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->location, sizeof(char), len, fp);
+
+        fread(&len, sizeof(int), 1, fp);
+        fread(node->geoPoint, sizeof(char), len, fp);
+
+        node->next = NULL;
+        Db->linkedSize = 1;
+        Db->currCapacity = 100;
+
+        if (prev == NULL) {
+            Db->picnicTableTable = node;
+        } else {
+            prev->next = node;
+        }
+        prev = node;
+    }
+
+    fclose(fp);
+    printf("Database uncompressed from %s\n", filename);
+}
 
 void freeDB(void){
-    int i,e;
+    int i;
+    //int e;
     PicnicTable *p = Db->picnicTableTable;
     for (i=0; i < 6; i++){
         free(Db->tableTypeTable->entries[i]);
@@ -560,6 +782,7 @@ int main (void){
     //importDB("PicnicTableSmall.csv");                                this doesn't work for some reason, the whole file path needs to be written in my case
     exportDB("test.csv");
 
+    //all testing here will be added to testing folder
     //testing countEntries()
     //int count = countEntries("Table Type","Square Picnic Table");
     //int count = countEntries("Surface Material","Composite");

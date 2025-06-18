@@ -12,4 +12,22 @@ Design of PicnicTable Database:
     -the value of every node will be a PicnicTable struct, representing an entry in the csv file
     Designing the four database tables (array, struct or linked list)?
         -each of the four database tables will be a struct, each with capacity and size members, then name and id members for their respective attributes
-    
+
+Design of Compression:
+    - The compressDB function writes the database to a binary file with structure to
+    minimize storage space while maintaining all relationships between tables
+    - The compressed file is organized into Lookup tables and PicnicTable linked lists
+    - Fixed size integers are written directly
+    - Variable length strings are stored with their length (int) and data (string)
+    - Linked list traversal to count nodes before writing
+
+Design of UnCompression:
+    - The unCompressDB function remakes the database by reading the binary file
+    in the same order it was written.
+    - The reading process is:
+        - Read size/number of entries
+        - Find ID, string length, allocate memory and read the data
+        - Read the number of nodes (count)
+        - Rebuild the linked lists by connecting nodes
+    - Use malloc for memory allocation
+    - Linked lists reconnection by using the "prev" pointer

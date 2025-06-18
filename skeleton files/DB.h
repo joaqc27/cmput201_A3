@@ -89,6 +89,7 @@ typedef struct {
     // these five tables. You can add anything you see fit here.
     char headBuffer[200];
     int linkedSize;
+    int currCapacity;
 
     LookupTable *tableTypeTable;
     LookupTable *surfaceMaterialTable;

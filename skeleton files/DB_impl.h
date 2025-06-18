@@ -62,49 +62,49 @@ int compareTableType(const void *a, const void *b);
 int compareSurfaceMat(const void *a, const void *b);
 
 /*
-    Purpose:    
-    Parameters: 
-    Pre:        
-    Post:       
-    Returns:    
+    Purpose:    Comparison function that returns values based on structuralID
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
 */
 int compareStructMat(const void *a, const void *b);
 
 /*
-    Purpose:    
-    Parameters: 
-    Pre:        
-    Post:       
-    Returns:    
+    Purpose:    Comparison function that returns values based on hoodID
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
 */
 int compareHoodID(const void *a, const void *b);
 
 /*
-    Purpose:    
-    Parameters: 
-    Pre:        
-    Post:       
-    Returns:    
+    Purpose:    Comparison function that returns values based on neighName
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
 */
 int compareNeighName(const void *a, const void *b);
 
 /*
-    Purpose:    
-    Parameters: 
-    Pre:        
-    Post:       
-    Returns:    
+    Purpose:    Comparison function that returns values based on ward
+    Parameters: *a and *b, generic pointers that are supposed to point to two values
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       None
+    Returns:    -1 if a < b, 0 if a = b, 1 if a > b, -2 if neither
 */
 int compareWard(const void *a, const void *b);
 
 /*
-    Purpose:    
-    Parameters: 
-    Pre:        
-    Post:       
-    Returns:    
+    Purpose:    Turn the inserted array (should be sorted by some member) back into a linked list to be implemented back into the database
+    Parameters: array, (pointer to an array of PicnicTable structs) to indicate the array being converted back
+    Pre:        Requires stdlib.h and PicnicTable struct to exist
+    Post:       Deletes inserted array and creates linked list
+    Returns:    A pointer to the first node in the linked list
 */
-void arrayToLinked(PicnicTable *array);
+PicnicTable* arrayToLinked(PicnicTable *array);
 
 /*
  * You may consider helper functions for the following tasks. Additional helper
