@@ -99,12 +99,12 @@ int compareWard(const void *a, const void *b);
 
 /*
     Purpose:    Turn the inserted array (should be sorted by some member) back into a linked list to be implemented back into the database
-    Parameters: array, (pointer to an array of PicnicTable structs) to indicate the array being converted back
+    Parameters: array, (pointer to an array of PicnicTable structs) to indicate the array being converted back, arrSize (int) to specify how many elements are in the to be converted array
     Pre:        Requires stdlib.h and PicnicTable struct to exist
     Post:       Deletes inserted array and creates linked list
     Returns:    A pointer to the first node in the linked list
 */
-PicnicTable* arrayToLinked(PicnicTable *array);
+PicnicTable* arrayToLinked(PicnicTable *array, int arrSize);
 
 /*
  * You may consider helper functions for the following tasks. Additional helper

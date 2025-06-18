@@ -229,10 +229,10 @@ void importDB(char *fileName){
     //print all nodes in order (also place in testing)
     PicnicTable *curr = Db->picnicTableTable;
     while (curr->next != NULL){
-        printf("[%d] %d %s\n",Db->linkedSize,curr->tableID, curr->streetave);
+        //printf("[%d] %d %s\n",Db->linkedSize,curr->tableID, curr->streetave);
         curr = curr->next;
     }
-    printf("%d %s\n",curr->tableID, curr->streetave);
+    //printf("%d %s\n",curr->tableID, curr->streetave);
     fclose(fp);
     printf("---end importDB()---\n");
 }
@@ -334,6 +334,45 @@ int compareWard(const void *a, const void *b){
     else if (verdict == 0){return 0;}
     else if (verdict < 0){return -1;}
     else{return -2;}
+}
+
+PicnicTable* arrayToLinked(PicnicTable *array, int arrSize){
+    int i;
+
+    PicnicTable* head = NULL;
+    //Db->size doesn't need to be adjusted since the array and linkedList should have the same number of elements
+    for (i=0; i < arrSize; i++){
+        printf("%d, %d, %s\n", array[i].tableID, array[i].tableTypeID,array[i].neighName);
+        PicnicTable *newNode = malloc(sizeof(PicnicTable)); //make a new node
+        //copy everything from the array struct into node struct
+        newNode->tableID = array[i].tableID;                
+        newNode->siteID = array[i].siteID;
+        newNode->tableTypeID = array[i].tableTypeID;
+        newNode->surfaceID = array[i].surfaceID;
+        newNode->structuralID = array[i].structuralID;
+        strcpy(newNode->streetave,array[i].streetave); 
+        newNode->hoodID = array[i].hoodID;
+        strcpy(newNode->ward, array[i].ward);
+        strcpy(newNode->latitude, array[i].latitude);
+        strcpy(newNode->longitude, array[i].longitude);
+        strcpy(newNode->neighName,array[i].neighName);
+        strcpy(newNode->location,array[i].location);
+        strcpy(newNode->geoPoint,array[i].geoPoint);
+
+        //insert node
+        if (head == NULL){
+            head = newNode;
+        }
+        else{
+            PicnicTable *p = head;
+            while (p->next != NULL){
+                p = p->next;
+            }
+            p->next = newNode;
+        }
+    }
+    free(array);    //free original array
+    return head;
 }
 
 //--NOTE: move these function definition to DB_impl.c when submitting / testing on student server, linking doesn't work properly for vscode so for now its just here
@@ -455,7 +494,6 @@ int countEntries(char *memberName, char *value){
 }
 
 void sortByMember(char *memberName){
-    //PicnicTable *p = Db->picnicTableTable;
     int linkedSize;
     
     //to use qsort, make linked list into an array (helper function?), sort it, then turn back into linked list
@@ -468,55 +506,53 @@ void sortByMember(char *memberName){
     if (strcmp(memberName, "Table Type") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable),compareTableType);
-        //for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].tableTypeID);}
     }
 
     //Surface Material (works)
     else if (strcmp(memberName, "Surface Material") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable), compareSurfaceMat);
-        //for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].surfaceID);}
     }
 
     //Structural Material (works)
     else if (strcmp(memberName, "Structural Material") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable), compareStructMat);
-        for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].structuralID);}
     }
 
     //Neighbourhood ID (works)
     else if (strcmp(memberName, "Neighbourhood Id") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable), compareHoodID);
-        for (int i=0; i < linkedSize; i++){printf("%d\n", newArray[i].hoodID);}
     }
 
     //Neighbourhood Name (works)
     else if (strcmp(memberName, "Neighbourhood Name") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable), compareNeighName);
-        for (int i=0; i < linkedSize; i++){printf("%s\n", newArray[i].neighName);}
     }
 
     //Ward
     else if (strcmp(memberName, "Ward") == 0){
         printf("sorting: %s\n", memberName);
         qsort(newArray,linkedSize,sizeof(PicnicTable), compareWard);
-        for (int i=0; i < linkedSize; i++){printf("%s\n", newArray[i].ward);}
     }
 
     //turn back into linked list
-    PicnicTable *np;
-    PicnicTable* firstNode = arrayToLinked(newArray);
+    PicnicTable *np = Db->picnicTableTable;
+    PicnicTable *firstNode = arrayToLinked(newArray,linkedSize);
 
-    //clear Db linked list
-    
-    //initialize Db linked list
-    
+    //free the whole old linked list, then link Db to thew new list
+    while (np != NULL){
+        np = np->next;
+        free(np);
+    }
+    Db->picnicTableTable = firstNode;
+
     //write the database to a .csv named after sorting member 
-    //export(memberName);
+    exportDB(memberName);
 }
+
 void compressDB(char *filename){
     FILE *fp = fopen(filename, "wb");
     if (fp == NULL) {
@@ -793,7 +829,7 @@ int main (void){
     //printf("count: %d\n",count);
 
     //testing sortByMember() - all works
-    sortByMember("Table Type"); 
+    //sortByMember("Table Type"); 
     //sortByMember("Surface Material"); 
     //sortByMember("Structural Material");
     //sortByMember("Neighbourhood Id");
