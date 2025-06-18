@@ -829,21 +829,23 @@ int main (void){
 
     //all testing here will be added to testing folder
     //testing countEntries()
-    //int count = countEntries("Table Type","Square Picnic Table");
+    int count = countEntries("Table Type","Square Picnic Table");
     //int count = countEntries("Surface Material","Composite");
     //int count = countEntries("Structural Material", "Metal");
     //int count = countEntries("Neighbourhood Id", "2630");
     //int count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
     //int count = countEntries("Ward","Ward Karhiio");
-    //printf("count: %d\n",count);
+    printf("count: %d\n",count);
 
     //testing sortByMember() - all works
-    //sortByMember("Table Type"); 
+    sortByMember("Table Type"); 
     //sortByMember("Surface Material"); 
     //sortByMember("Structural Material");
     //sortByMember("Neighbourhood Id");
     //sortByMember("Neighbourhood Name");
     //sortByMember("Ward");
+
+    //freeDB();
 
     return 0;
 }

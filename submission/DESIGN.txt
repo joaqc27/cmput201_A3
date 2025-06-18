@@ -32,8 +32,6 @@ Design of UnCompression:
     - Use malloc for memory allocation
     - Linked lists reconnection by using the "prev" pointer
 
-    - Linked lists reconnection by using the "prev" pointer
-
 Design of Free:
     - The freeDB() function properly deallocates all dynamically allocated
     memory used by the database to prevent memory leaks.
