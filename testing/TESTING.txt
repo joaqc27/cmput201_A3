@@ -10,22 +10,44 @@ Testing Each of the 7 Functions in DB.c
 
 1. importDB()
     - implementation of the Database from a .csv file is tested by comparing printing statements of Lookup Tables to expected output of the Lookup Tables, and comparing printing statements of the Picnic Table Linked List to the expected outputs
-    - the expected outputs of the lookup tables and main PicnicTable database are found in importDBOutput.txt
+    - the expected outputs of the lookup tables and main PicnicTable database are found in correctImportDB.txt
     - input: PicnicTableSmall.csv
-    - output: importDBOutput.txt
-    - diff command is ran on the printing output of importDB() and importDBOutput.txt
+    - output: testImportDBOut.txt
+    - verified file: correctImportDB.txt
 
 2. exportDB()
     - testing exportDB() will be tested by running a diff command on the function's output file and PicnicTableSmall.csv
+    - note that the diff command between strictly exportDB() and PicnicTableSmall.csv returns no issues, but for testExport.c to function properly, it needs to have importDB called in the same main function, which would give an output different than PicnicTable.csv
+    - input: none
+    - output: testing/testExportDBOut.txt (a combination of importDB output and exportDB csv file)
+    - verified file: correctExportDB.txt
 
 3. countEntries()
-    -prints the expected return value as integer "count"
-    -tests function calls on all members specified in DB.h
-    -all function calls in this section are what I used while developing the function
+    - prints the expected return value as integer "count"
+    - tests function calls on all members specified in DB.h
+    - all function calls in this section are what I used while developing the function
+    - input: none
+    - output: testing/testCountEntries
+    - verified file: testing/correctCountEntries.txt
+    - much like exportDB() testing, this function can't function on its own, it needs importDB() to be called in order to properly count up entries specified
 
-4. sortByMember()
-    -
+4. sortByMember() - good
+    -calls the function on all members specified in DB.h
+    -runs a diff command on all the output files in comparison to verified sorted files for each member
+    -these verified sorted files are manually compared side by side by using Excel to sort csv files based on members WHILE keeping in mind the values the lookup tables assigned based on order of appearance in the original csv file
+    -ISSUES
 
 5. compressDB()
+    - Compresses the database to compressed_db.bin
+    - Checking the file's existence and comparing its size to the original CSV file
+    - Confirms the compressed file is created and smaller than the uncompressed version
+
 6. unCompressDB()
+    - Loads the database from the compressed binary file and reconstructs all data structures
+    - Uncompressed data is exported to CSV and compared to the original file
+    - Successful test shows matching data between original and uncompressed versions
+
 7. freeDB()
+    - Verify proper memory deallocation for both populated and empty databases
+    - The test includes edge cases like freeing an empty database structure
+    - Expected output shows successful freeing with no memory errors reported

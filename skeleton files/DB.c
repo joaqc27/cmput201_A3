@@ -1,7 +1,6 @@
 /* DB.c
  *
- * TODO: Provide a high-level description of what is contained
- * in this file.
+ * Description: Holds all function definitions declared in DB.h to implement a fully functioning database
  *
  * Author: Joaquin Carbonell, Jigarjeet Mannan
  * Lab instructor: Dr. Philip Mees
@@ -19,9 +18,8 @@ DataBase *Db; /* definition of the main database variable */ //is a global varia
 
 void importDB(char *fileName){
     FILE *fp;
-    char testBuffer[1000];  
-    
-    int i=0, colCount, uID=0;
+    char testBuffer[1000];
+    int i=0, colCount, uID=1;
     
     //initialize database
     Db = malloc(sizeof(DataBase));
@@ -37,10 +35,6 @@ void importDB(char *fileName){
     Db->structuralMaterialTable->capacity = 5;
     Db->neighbourhoodTable->capacity = 20;      //assumes there's 20 neighbourhoods for now
 
-    //--NOTE: NODES HAVE NOW BEEN IMPLEMENTED--
-
-    printf("database: %p\nfile: %s\n", Db, fileName);
-
     //read csv and input them into database
     fp = fopen(fileName,"r");
     if (fp == NULL){
@@ -53,11 +47,10 @@ void importDB(char *fileName){
     while(fgets(testBuffer,1000,fp)){           //read line by line (this is where a new node starts)
         char *token = strtok(testBuffer, ",");
         colCount = 0;
-        //printf("\n");
         
         PicnicTable *node = malloc(sizeof(PicnicTable));
         
-        while (token != NULL & colCount < 10){     //ensures only reads from headers "Id" to "Longitude" in the csv
+        while (token != NULL && colCount < 10){     //ensures only reads from headers "Id" to "Longitude" in the csv
 
             //change to switch statement?
             if(colCount == 0){                       //assign tableID and siteID
@@ -169,70 +162,54 @@ void importDB(char *fileName){
 
         //insert node into linked list
         if (Db->picnicTableTable == NULL){      //if the list is empty, this node is the first one
-            //printf("---first!---\n");
             Db->picnicTableTable = node;
         }
         else{                                   //otherwise, probe to the end of the linked list 
             PicnicTable *p = Db->picnicTableTable;
-            //printf("--next!--\n");
             while(p->next != NULL){
                 p = p->next;
             }
             p->next = node;
-            //printf("---end---\n");
         }
-
-        //check nodes
-        /*
-        printf("%d\n",node->tableID);
-        printf("capacity:   %d\n",node->capacity);
-        printf("size:       %d\n",node->size);
-        printf("siteID:     %d\n",node->siteID);
-        printf("tableTypeID:%d\n",node->tableTypeID);
-        printf("surfaceID:  %d\n",node->surfaceID);
-        printf("structuralID%d\n",node->structuralID);
-        printf("street/ave: %s\n",node->streetave);
-        printf("hoodID:     %d\n",node->hoodID);
-        printf("ward:       %s\n",node->ward);
-        printf("latitude:   %s\n",node->latitude);
-        printf("longitude:  %s\n",node->longitude);
-        printf("next:       %p\n",node->next);
-        printf("successfully added line!\n");                           //everything works
-        */
     }
 
     //print lookup tables (place in testing?)
-    printf("\n---tableTypeLookupTable---\ncapacity = %d, size = %d\n",Db->tableTypeTable->capacity, Db->tableTypeTable->size);
+    printf("\nTable Type Table\ncapacity = %d, size = %d\n",Db->tableTypeTable->capacity, Db->tableTypeTable->size);
     for (i=0; i < Db->tableTypeTable->capacity; i++){
-        printf("%d ",Db->tableTypeTable->ids[i]);
-        printf("%s\n",Db->tableTypeTable->entries[i]);
+        if (Db->tableTypeTable->entries[i] != NULL){
+            printf("%d  %s\n",Db->tableTypeTable->ids[i],Db->tableTypeTable->entries[i]);
+        }
     }
 
-    printf("\n---surfaceMaterialLookupTable---\ncapacity = %d, size = %d\n",Db->surfaceMaterialTable->capacity, Db->surfaceMaterialTable->size);
+    printf("\nSurface Material Table\ncapacity = %d, size = %d\n",Db->surfaceMaterialTable->capacity, Db->surfaceMaterialTable->size);
     for (i=0; i < Db->surfaceMaterialTable->capacity; i++){
-        printf("%d ",Db->surfaceMaterialTable->ids[i]);
-        printf("%s\n",Db->surfaceMaterialTable->entries[i]);
+        if(Db->surfaceMaterialTable->entries[i] != NULL){
+            printf("%d  %s\n",Db->surfaceMaterialTable->ids[i],Db->surfaceMaterialTable->entries[i]);
+        }
     }
 
-    printf("\n---structuralMaterialLookupTable---\ncapacity = %d, size = %d\n",Db->structuralMaterialTable->capacity, Db->structuralMaterialTable->size);
+    printf("\nStructural Material Table\ncapacity = %d, size = %d\n",Db->structuralMaterialTable->capacity, Db->structuralMaterialTable->size);
     for (i=0; i < Db->structuralMaterialTable->capacity; i++){
-        printf("%d ",Db->structuralMaterialTable->ids[i]);
-        printf("%s\n",Db->structuralMaterialTable->entries[i]);
+        if(Db->structuralMaterialTable->entries[i] != NULL){
+            printf("%d  %s\n",Db->structuralMaterialTable->ids[i],Db->structuralMaterialTable->entries[i]);
+        }
     }
 
-    printf("\n---neighbourhoodLookupTable---\ncapacity = %d, size = %d\n",Db->neighbourhoodTable->capacity, Db->neighbourhoodTable->size);
+    printf("\nNeighbourhood Table \ncapacity = %d, size = %d\n",Db->neighbourhoodTable->capacity, Db->neighbourhoodTable->size);
     for (i=0; i < Db->neighbourhoodTable->capacity; i++){
-        printf("%d ",Db->neighbourhoodTable->nID[i]);
-        printf("%s\n",Db->neighbourhoodTable->nName[i]);
+        if(Db->neighbourhoodTable->nName[i] != NULL){
+            printf("%d  %s\n",Db->neighbourhoodTable->nID[i],Db->neighbourhoodTable->nName[i]);
+        }
     }
 
-    //print all nodes in order (also place in testing)
+    printf("\nPicnic Table Table\ncapacity = %d, size = %d\n", Db->currCapacity, Db->linkedSize);
     PicnicTable *curr = Db->picnicTableTable;
     while (curr->next != NULL){
-        //printf("[%d] %d %s\n",Db->linkedSize,curr->tableID, curr->streetave);
+        printf("   %-3d  %-5d %-2d %-2d %-2d %-4d %-25s %-20s %-s %-s\n",curr->tableID, curr->siteID, curr->tableTypeID, curr->surfaceID, curr->structuralID, curr->hoodID, curr->streetave, curr->ward, curr->latitude, curr->longitude);
         curr = curr->next;
     }
-    //printf("%d %s\n",curr->tableID, curr->streetave);
+    printf("   %-3d  %-5d %-2d %-2d %-2d %-4d %-25s %-20s %-s %-s\n",curr->tableID, curr->siteID, curr->tableTypeID, curr->surfaceID, curr->structuralID, curr->hoodID, curr->streetave, curr->ward, curr->latitude, curr->longitude);
+
     fclose(fp);
     printf("---end importDB()---\n");
 }
@@ -389,7 +366,7 @@ void exportDB(char *fileName){          //takes database and turns back into a c
 
     //write every entry to file
     while(curr->next != NULL){
-        //binary write
+        
         fprintf(fp,"%d,%s,%s,%s,%s,%d,%s,%s,%s,%s,%s,%s\n",curr->siteID,
         Db->tableTypeTable->entries[curr->tableTypeID],
         Db->surfaceMaterialTable->entries[curr->surfaceID], 
@@ -424,7 +401,7 @@ int countEntries(char *memberName, char *value){
     //membernames: Table Type (works)
     if (strcmp(memberName,"Table Type") == 0){
         translatedVal = fetchTable(Db->tableTypeTable,value);
-        //printf("translated val: %d\n", translatedVal);
+        printf("count val: %d\n", translatedVal);
         while(p->next != NULL){
             if (p->tableTypeID == translatedVal){count++;}
             p = p->next;
@@ -436,7 +413,7 @@ int countEntries(char *memberName, char *value){
     //Surface Material (works)
     if (strcmp(memberName, "Surface Material") == 0){
         translatedVal = fetchTable(Db->surfaceMaterialTable,value);
-        printf("translated val: %d\n", translatedVal);
+        printf("count val: %d\n", translatedVal);
         while (p->next != NULL){
             if (p->surfaceID == translatedVal){count++;}
             p = p->next;
@@ -447,7 +424,7 @@ int countEntries(char *memberName, char *value){
     //Structural Material (works)
     if (strcmp(memberName, "Structural Material") == 0){
         translatedVal = fetchTable(Db->structuralMaterialTable,value);
-        printf("translated val: %d\n", translatedVal);
+        printf("count val: %d\n", translatedVal);
         while (p->next != NULL){
             if(p->structuralID == translatedVal){count++;}
             p = p->next;
@@ -458,7 +435,7 @@ int countEntries(char *memberName, char *value){
 
     //Neighbourhood ID  (works)
     if (strcmp(memberName, "Neighbourhood Id") == 0){
-        printf("translated val: %d\n", atoi(value));
+        printf("count val: %d\n", atoi(value));
         while(p->next != NULL){
             if(p->hoodID == atoi(value)){count++;}
             p = p->next;
@@ -469,7 +446,7 @@ int countEntries(char *memberName, char *value){
 
     //Neighbourhood Name (works)
     if (strcmp(memberName, "Neighbourhood Name") == 0){
-        printf("translated val: %s\n", value);
+        printf("count val: %s\n", value);
         while(p->next != NULL){
             if(strcmp(p->neighName,value) == 0){count++;}
             p = p->next;
@@ -480,7 +457,7 @@ int countEntries(char *memberName, char *value){
 
     //Ward (works)
     if (strcmp(memberName, "Ward") == 0){
-        printf("translated val: %s\n", value);
+        printf("count val: %s\n", value);
         while(p->next != NULL){
             if(strcmp(p->ward,value) == 0){count++;}
             p = p->next;
@@ -817,33 +794,34 @@ void freeDB(void){
     // Finally free the database structure itself
     free(Db);
 
-    //free(Db->headBuffer);       //free headBuffer
-    //free(Db);                   //free Db
 }
 
 //test main function (for vsCode, delete later)
 int main (void){
-    importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
+    //int count;
+    //importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
     //importDB("PicnicTableSmall.csv");                                this doesn't work for some reason, the whole file path needs to be written in my case
-    exportDB("test.csv");
+    //exportDB("testexport.csv");
 
+    /*
     //all testing here will be added to testing folder
     //testing countEntries()
-    int count = countEntries("Table Type","Square Picnic Table");
+    //int count = countEntries("Table Type","Square Picnic Table");
     //int count = countEntries("Surface Material","Composite");
     //int count = countEntries("Structural Material", "Metal");
     //int count = countEntries("Neighbourhood Id", "2630");
     //int count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
     //int count = countEntries("Ward","Ward Karhiio");
-    printf("count: %d\n",count);
+    //printf("count: %d\n",count);
 
     //testing sortByMember() - all works
     sortByMember("Table Type"); 
-    //sortByMember("Surface Material"); 
-    //sortByMember("Structural Material");
-    //sortByMember("Neighbourhood Id");
-    //sortByMember("Neighbourhood Name");
-    //sortByMember("Ward");
+    sortByMember("Surface Material"); 
+    sortByMember("Structural Material");
+    sortByMember("Neighbourhood Id");
+    sortByMember("Neighbourhood Name");
+    sortByMember("Ward");
+    */
 
     //freeDB();
 

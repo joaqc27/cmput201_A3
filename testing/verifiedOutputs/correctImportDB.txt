@@ -1,0 +1,43 @@
+
+Table Type Table
+capacity = 3, size = 3
+0  Square Picnic Table
+1  Round Picnic Table
+2  Other Table
+
+Surface Material Table
+capacity = 6, size = 3
+0  Wood
+1  Metal
+2  Composite
+
+Structural Material Table
+capacity = 5, size = 2
+0  Aggregate
+1  Metal
+
+Neighbourhood Table
+capacity = 20, size = 10
+6320  IDYLWYLDE
+6760  TWEDDLE PLACE
+5170  EMPIRE PARK
+5390  RIVER VALLEY WALTERDALE
+2630  RIVER VALLEY HERMITAGE
+4140  ELMWOOD
+6040  BONNIE DOON
+2450  LAGO LINDO
+3030  BATURYN
+
+Picnic Table Table
+capacity = 10, size = 10
+   1    10846 0  0  0  6320 81 STREET NW              Ward Metis           53.52328786931638 -113.45157083212658
+   2    19102 0  0  0  6760 42 AVENUE NW              Ward Karhiio         53.47717778004791 -113.45638184763084
+   3    15125 0  0  1  5170 108A STREET NW            Ward papastew        53.48598782882411 -113.51079463820228
+   4    3129  0  0  1  5390 WALTERDALE HILL NW        Ward papastew        53.527054932823 -113.50919530345142
+   5    83218 0  0  1  2630 HERMITAGE PARK ROAD NW    Ward Dene            53.58391675640636 -113.36919584236544
+   6    4941  1  1  1  4140 83 AVENUE NW              Ward sipiwiyiniwak   53.51585862577698 -113.60615502675536
+   7    10701 2  2  1  6040 92 AVENUE NW              Ward Metis           53.52784245278216 -113.47075155826579
+   8    3712  0  0  0  2450 95 STREET NW              Ward tastawiyiniwak  53.63439276566274 -113.48765182690954
+   9    8853  0  0  0  3030 111 STREET NW             Ward tastawiyiniwak  53.634224985574384 -113.51377762740627
+   10   83219 0  0  1  2630 HERMITAGE PARK ROAD NW    Ward Dene            53.586715635885 -113.37426313566749
+---end importDB()---

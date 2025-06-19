@@ -13,6 +13,10 @@
 #ifndef DB_H
 #define DB_H
 
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 /*
  * If you are using arrays for your DataBase tables, they must use dynamic memory,
  * and the initial size of each table must be set to INIT_SIZE.

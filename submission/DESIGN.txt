@@ -7,6 +7,10 @@ Lecture instructor: Dr. Philip Mees
 Purpose: Hold information regarding the design of the PicnicTable Database
 -----------------
 
+Issues Found:
+    -testing the sortByMember rules on the student server seems to crash, it prints that "testing/PicnicTableSmall.csv" cannot be opened even though its in the same folder and references the same directory; this seems to be an issue exclusive to the students server as well and no problems arise in vscode (unresolved) 
+    -testing importDB() on student server found a segmentation fault since when printing the lookup tables, the code was trying to reference a NULL pointer. This issue didn't seem to rise during testing on vscode likely due to how it deals with NULL pointers, but on the student server, just required a NULL check 
+
 Design of PicnicTable Database:
     -the entire database will consist of a basic linked list, each with a value and pointer
     -the value of every node will be a PicnicTable struct, representing an entry in the csv file

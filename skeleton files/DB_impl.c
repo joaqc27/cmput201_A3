@@ -1,7 +1,6 @@
 /* DB_impl.c
  *
- * TODO: Provide a high-level description of what is contained
- * in this file.
+ * Description: Contains all definitions of privately declared functions declared in DB_impl.h
  *
  * Author: Joaquin Carbonell, Jigarjeet Mannan
  * Lab instructor: Dr. Philip Mees
@@ -10,17 +9,22 @@
 
 #include "DB.h"       /* Import the public database header. */
 #include "DB_impl.h"  /* Import the private database header */
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
 
 //full function definition being developed/tested in DB.c, but for full submission, this should be uncommented and the one in DB.c should be deleted
 
 /*
 char* fetchNeighbourhood(NeighbourhoodTable *tablep, int hoodID){
     int i;
+    char *error = NULL;
     for(i=0; i < tablep->size; i++){
         if(hoodID == tablep->nID[i]){
             return tablep->nName[i];
         }
     }
+    return error;
 }
 
 int fetchTable(LookupTable *tablep, char *tabletype){
@@ -29,6 +33,7 @@ int fetchTable(LookupTable *tablep, char *tabletype){
             return tablep->ids[i];
         }
     }
+    return 0;
 }
 
 PicnicTable* linkedToArray(DataBase *Db, int linkedSize){

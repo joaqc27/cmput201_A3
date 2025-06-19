@@ -15,6 +15,11 @@
 
 #ifndef DB_IMPL_H
 #define DB_IMPL_H
+#include "DB.h"
+#include <stdio.h>
+#include <string.h>
+#include <stdlib.h>
+
 /*
     Purpose:    Looks for the corresponding neighbourhood name in the neighbourhood lookup table given the ID 
     Parameters: tablep (LookupTable pointer): to reference the LookupTable being searched in, hoodID (int): to target the neighbourhood name to be found

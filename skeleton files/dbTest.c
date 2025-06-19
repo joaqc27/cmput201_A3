@@ -14,11 +14,9 @@
 int main(void){
     int count;
 
-    //test DB module functions on smaller csv file
-
     //1. importDB()
-    importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
-    //importDB("PicnicTableSmall.csv");
+    //importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
+    importDB("PicnicTableSmall.csv");
 
     //2. exportDB()
     exportDB("testexport.csv");
@@ -38,6 +36,7 @@ int main(void){
     count = countEntries("Ward", "Ward Karhiio");
     printf("count: %d\n",count);    //expects 1
 
+    
     //4. sortByMember() -> check the exported membername files
     sortByMember("Table Type"); 
     sortByMember("Surface Material"); 
@@ -45,18 +44,38 @@ int main(void){
     sortByMember("Neighbourhood Id");
     sortByMember("Neighbourhood Name");
     sortByMember("Ward");
+    //diff Table Type verifiedOutput\Table Type etc
+    
 
     //5. compressDB()
+    printf("\nTesting compressDB()\n");
+    compressDB("compressed_db.bin");
+    printf("Database compressed to 'compressed_db.bin'\n");
 
     //6. uncompressDB()
+    printf("\nTesting unCompressDB()\n");
+    freeDB(); // Free existing database first
+    unCompressDB("compressed_db.bin");
+    printf("Database uncompressed from 'compressed_db.bin'\n");
 
     //7. freeDB()
-    
-    //test on full csv file
+    printf("\nTesting freeDB()\n");
+    freeDB();
+    printf("Database memory successfully freed\n");
 
+    // Test with empty database
+    printf("\nTesting with empty database\n");
+    Db = malloc(sizeof(DataBase));
+    Db->picnicTableTable = NULL;
+    freeDB();
+    printf("Empty database freed successfully\n");
 
 
     //test dashboard
+
+
+
+    freeDB();
 
     return 0;
 }
