@@ -20,7 +20,7 @@ void importDB(char *fileName){
     FILE *fp;
     char testBuffer[1000];
     int i=0, colCount, uID=1;
-    
+
     //initialize database
     Db = malloc(sizeof(DataBase));
 
@@ -798,30 +798,38 @@ void freeDB(void){
 
 //test main function (for vsCode, delete later)
 int main (void){
-    //int count;
-    //importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
+    int count;
+    importDB("/Users/Joaquin/Downloads/cs/cmpt201/CMPT201/labs/cmput201_A3/skeleton files/PicnicTableSmall.csv");
     //importDB("PicnicTableSmall.csv");                                this doesn't work for some reason, the whole file path needs to be written in my case
-    //exportDB("testexport.csv");
+    exportDB("testexport.csv");
 
-    /*
-    //all testing here will be added to testing folder
-    //testing countEntries()
-    //int count = countEntries("Table Type","Square Picnic Table");
-    //int count = countEntries("Surface Material","Composite");
-    //int count = countEntries("Structural Material", "Metal");
-    //int count = countEntries("Neighbourhood Id", "2630");
-    //int count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
-    //int count = countEntries("Ward","Ward Karhiio");
-    //printf("count: %d\n",count);
+    //3. countEntries()
+    count = countEntries("Table Type","Square Picnic Table");       
+    printf("count: %d\n",count);    //expects 8
+    count = countEntries("Surface Material", "Composite");         
+    printf("count: %d\n",count);    //expects 1
+    count = countEntries("Structural Material","Metal");           
+    printf("count: %d\n",count);    //expects 6
+    count = countEntries("Neighbourhood Id", "2630");              
+    printf("count: %d\n",count);    //expects 2
+    count = countEntries("Neighbourhood Name", "RIVER VALLEY HERMITAGE");
+    printf("count: %d\n",count);    //expects 2
+    count = countEntries("Ward", "Ward Karhiio");
+    printf("count: %d\n",count);    //expects 1
 
-    //testing sortByMember() - all works
+   //4. sortByMember() -> check the exported membername files
     sortByMember("Table Type"); 
     sortByMember("Surface Material"); 
     sortByMember("Structural Material");
     sortByMember("Neighbourhood Id");
     sortByMember("Neighbourhood Name");
     sortByMember("Ward");
-    */
+
+    //compressDB("compressTest.bin");
+    freeDB();
+    unCompressDB("compressed_db.bin");
+
+
 
     //freeDB();
 
