@@ -69,12 +69,7 @@ int main(void){
     Db->picnicTableTable = NULL;
     freeDB();
     printf("Empty database freed successfully\n");
-
-
-    //test dashboard
-
-
-
+    
     freeDB();
 
     return 0;
